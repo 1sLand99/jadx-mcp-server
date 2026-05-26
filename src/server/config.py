@@ -20,6 +20,10 @@ JADX_HOST = "127.0.0.1"
 JADX_PORT = 8650
 JADX_HTTP_BASE = f"http://{JADX_HOST}:{JADX_PORT}"
 
+# HTTP read timeouts (seconds) for plugin communication
+JADX_DEFAULT_TIMEOUT = 600.0
+JADX_SEARCH_TIMEOUT = 3600.0
+
 # Logging Setup
 logger = logging.getLogger("jadx-mcp-server")
 if not logger.handlers:
@@ -86,7 +90,11 @@ def health_ping() -> Union[str, Dict[str, Any]]:
         return {"error": str(e)}
 
 
-async def get_from_jadx(endpoint: str, params: Dict[str, Any] = None) -> Union[str, Dict[str, Any]]:
+async def get_from_jadx(
+    endpoint: str,
+    params: Dict[str, Any] = None,
+    timeout: float = JADX_DEFAULT_TIMEOUT,
+) -> Union[str, Dict[str, Any]]:
     """
     Generic async helper to request data from the JADX plugin.
 
@@ -107,7 +115,7 @@ async def get_from_jadx(endpoint: str, params: Dict[str, Any] = None) -> Union[s
     url = f"{JADX_HTTP_BASE}/{endpoint.lstrip('/')}"
     try:
         async with httpx.AsyncClient(trust_env=False) as client:
-            resp = await client.get(url, params=params, timeout=3600)
+            resp = await client.get(url, params=params, timeout=timeout)
             resp.raise_for_status()
 
             # Try to parse JSON, fallback to text if not valid JSON
@@ -123,7 +131,7 @@ async def get_from_jadx(endpoint: str, params: Dict[str, Any] = None) -> Union[s
 
     except httpx.TimeoutException:
         error_msg = (
-            f"Request to JADX plugin timed out after 3600s for endpoint '{endpoint}'. "
+            f"Request to JADX plugin timed out after {timeout}s for endpoint '{endpoint}'. "
             "The operation may still be running in JADX-GUI. "
             "For large APKs, code-level searches can take several minutes."
         )
@@ -158,6 +166,13 @@ async def post_to_jadx(endpoint: str, params: Dict[str, Any] = None) -> Union[st
                 return resp.json()
             except json.JSONDecodeError:
                 return {"response": resp.text}
+    except httpx.TimeoutException:
+        return {
+            "error": (
+                f"POST to JADX plugin timed out after 30s for endpoint '{endpoint}'. "
+                f"Target: {JADX_HTTP_BASE}"
+            )
+        }
     except httpx.ConnectError:
         return {"error": f"Cannot connect to JADX plugin at {JADX_HTTP_BASE}. Ensure JADX-GUI is running."}
     except Exception as e:

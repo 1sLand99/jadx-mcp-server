@@ -15,10 +15,15 @@ import asyncio
 import logging
 from typing import Optional
 
-from src.server.config import get_from_jadx, get_search_progress
+from src.server.config import get_from_jadx, get_search_progress, JADX_SEARCH_TIMEOUT
 from src.PaginationUtils import PaginationUtils
 
 logger = logging.getLogger("jadx-mcp-server.search")
+
+
+async def _get_from_jadx_search(endpoint: str, params=None):
+    """Fetch from plugin with extended timeout for long-running searches."""
+    return await get_from_jadx(endpoint, params, timeout=JADX_SEARCH_TIMEOUT)
 
 
 async def _poll_progress(
@@ -217,7 +222,7 @@ async def search_method_by_name(method_name: str, report_progress=None) -> dict:
     # Fire search request and progress poller concurrently
     progress_task = asyncio.create_task(_poll_progress(report_progress))
     try:
-        result = await get_from_jadx("search-method", {"method_name": method_name})
+        result = await _get_from_jadx_search("search-method", {"method_name": method_name})
     finally:
         progress_task.cancel()
         try:
@@ -286,7 +291,7 @@ async def search_classes_by_keyword(
                 "search_in": search_in,
             },
             data_extractor=lambda parsed: parsed.get("classes", []),
-            fetch_function=get_from_jadx,
+            fetch_function=_get_from_jadx_search,
         )
     finally:
         progress_task.cancel()
