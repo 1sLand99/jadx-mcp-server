@@ -11,7 +11,32 @@ See the file 'LICENSE' for copying permission
 
 import argparse
 import logging
+import os
 import sys
+
+# ---------------------------------------------------------------------------
+# Sanitise proxy-related environment variables BEFORE any library reads them.
+#
+# Problem (GitHub issue #99): if no_proxy (or any *_PROXY var) contains
+# non-printable characters such as trailing newlines — common when set via
+# .env files or proxy managers — httpx raises InvalidURL on the first request.
+# Our own httpx calls use trust_env=False, but third-party code (e.g.
+# fastmcp's version check) may not, so we clean the environment globally.
+# ---------------------------------------------------------------------------
+_PROXY_VARS = (
+    "HTTP_PROXY", "http_proxy",
+    "HTTPS_PROXY", "https_proxy",
+    "ALL_PROXY", "all_proxy",
+    "NO_PROXY", "no_proxy",
+)
+for _var in _PROXY_VARS:
+    _val = os.environ.get(_var)
+    if _val is not None:
+        _clean = _val.strip()
+        if _clean != _val:
+            os.environ[_var] = _clean
+        if not _clean:
+            del os.environ[_var]
 from fastmcp import FastMCP, Context
 from src.banner import jadx_mcp_server_banner
 from src.server import config, tools
