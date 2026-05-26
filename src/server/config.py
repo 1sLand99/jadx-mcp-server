@@ -21,7 +21,7 @@ JADX_PORT = 8650
 JADX_HTTP_BASE = f"http://{JADX_HOST}:{JADX_PORT}"
 
 # HTTP read timeouts (seconds) for plugin communication
-JADX_DEFAULT_TIMEOUT = 600.0
+JADX_DEFAULT_TIMEOUT = 60.0
 JADX_SEARCH_TIMEOUT = 3600.0
 
 # Logging Setup

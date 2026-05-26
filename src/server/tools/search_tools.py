@@ -13,7 +13,6 @@ License: See LICENSE file
 
 import asyncio
 import logging
-from typing import Optional
 
 from src.server.config import get_from_jadx, get_search_progress, JADX_SEARCH_TIMEOUT
 from src.PaginationUtils import PaginationUtils
@@ -32,7 +31,6 @@ async def _poll_progress(
     budget_seconds: float = 600.0,
     absolute_max_seconds: float = 3600.0,
     extension_threshold: float = 0.90,
-    cancel_search_event: Optional[asyncio.Event] = None,
 ):
     """
     Continuously poll /search-progress and report via MCP progress notifications.
@@ -45,9 +43,6 @@ async def _poll_progress(
     original amount (e.g. +600s).  Extensions repeat until the search finishes
     or the absolute_max_seconds ceiling is reached.
 
-    If cancel_search_event is provided and gets set, the poller will signal that
-    the main HTTP request should be abandoned (the caller should cancel the task).
-
     Args:
         report_progress: Callable(progress, total) from FastMCP Context,
                          or None if no progress reporting is available.
@@ -56,8 +51,6 @@ async def _poll_progress(
                         the poller checks status and may extend.
         absolute_max_seconds: Hard ceiling — never extend beyond this total.
         extension_threshold: Fraction (0-1) of budget at which to evaluate extension.
-        cancel_search_event: If set, the poller will set() this event to signal
-                             the caller to cancel the HTTP request.
     """
     if report_progress is None:
         return
@@ -87,15 +80,14 @@ async def _poll_progress(
                     "Progress poller: absolute max time (%.0fs) reached after %d extensions. Stopping.",
                     absolute_max_seconds, extensions_granted,
                 )
-                if cancel_search_event:
-                    cancel_search_event.set()
                 break
 
             # dynamic timeout check: approaching the current deadline?
+            progress = None
             if elapsed >= current_deadline * extension_threshold and seen_running:
                 # Ask the plugin: "Are you still searching?"
-                check = await get_search_progress()
-                check_state = check.get("state", "unknown")
+                progress = await get_search_progress()
+                check_state = progress.get("state", "unknown")
                 if check_state == "running":
                     # plugin confirms it's still working => grant extension
                     new_deadline = current_deadline + original_budget
@@ -110,18 +102,18 @@ async def _poll_progress(
                     )
                     try:
                         # inform the MCP client about the extension
-                        scanned = check.get("scanned", 0)
-                        total = check.get("total", 0)
+                        scanned = progress.get("scanned", 0)
+                        total = progress.get("total", 0)
                         if total > 0:
                             await report_progress(scanned, total)
                     except Exception:
                         pass
                     current_deadline = new_deadline
                 elif check_state in ("completed", "failed"):
-                    # Search ended while we were checking ,will be caught below
+                    # Search ended while we were checking, will be caught below
                     pass
                 else:
-                    # plugin unreachable near deadline , not safe to extend
+                    # plugin unreachable near deadline, not safe to extend
                     logger.warning(
                         "Progress poller: budget nearly exhausted at %.0fs and plugin state "
                         "is '%s'. Not extending.",
@@ -134,11 +126,12 @@ async def _poll_progress(
                     "Progress poller: deadline (%.0fs) exceeded with %d extensions granted. Stopping.",
                     current_deadline, extensions_granted,
                 )
-                if cancel_search_event:
-                    cancel_search_event.set()
                 break
 
-            progress = await get_search_progress()
+            # Normal poll — only if we didn't already poll during extension check
+            if progress is None:
+                progress = await get_search_progress()
+
             # Java sends state in lowercase: "idle", "running", "completed", "failed"
             state = progress.get("state", "unknown")
 
