@@ -180,13 +180,14 @@ async def _poll_progress(
         pass
 
 
-async def get_method_by_name(class_name: str, method_name: str) -> dict:
+async def get_method_by_name(class_name: str, method_name: str, method_signature: str = None) -> dict:
     """
     Fetch the source code of a method from a specific class.
 
     Args:
         class_name: Fully qualified class name
         method_name: Method name (can include signature)
+        method_signature: Optional method signature/descriptor (e.g. '(I)V') to distinguish overloads
 
     Returns:
         dict: Method source code and metadata
@@ -194,9 +195,10 @@ async def get_method_by_name(class_name: str, method_name: str) -> dict:
     MCP Tool: get_method_by_name
     Description: Retrieves specific method implementation from a known class
     """
-    return await get_from_jadx(
-        "method-by-name", {"class_name": class_name, "method_name": method_name}
-    )
+    params = {"class_name": class_name, "method_name": method_name}
+    if method_signature:
+        params["method_signature"] = method_signature
+    return await get_from_jadx("method-by-name", params)
 
 
 async def search_method_by_name(method_name: str, report_progress=None) -> dict:

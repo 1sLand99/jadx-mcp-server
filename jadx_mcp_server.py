@@ -92,9 +92,9 @@ async def get_selected_text() -> dict:
 
 
 @mcp.tool()
-async def get_method_by_name(class_name: str, method_name: str) -> dict:
+async def get_method_by_name(class_name: str, method_name: str, method_signature: str = None) -> dict:
     """Fetch the source code of a method from a specific class."""
-    return await tools.search_tools.get_method_by_name(class_name, method_name)
+    return await tools.search_tools.get_method_by_name(class_name, method_name, method_signature)
 
 
 @mcp.tool()
@@ -263,9 +263,9 @@ async def rename_class(class_name: str, new_name: str) -> dict:
 
 
 @mcp.tool()
-async def rename_method(method_name: str, new_name: str) -> dict:
+async def rename_method(method_name: str, new_name: str, method_signature: str = None) -> dict:
     """Renames a specific method."""
-    return await tools.refactor_tools.rename_method(method_name, new_name)
+    return await tools.refactor_tools.rename_method(method_name, new_name, method_signature)
 
 
 @mcp.tool()

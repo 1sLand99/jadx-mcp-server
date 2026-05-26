@@ -29,13 +29,14 @@ async def rename_class(class_name: str, new_name: str) -> dict:
     return await get_from_jadx("rename-class", {"class_name": class_name, "new_name": new_name})
 
 
-async def rename_method(method_name: str, new_name: str) -> dict:
+async def rename_method(method_name: str, new_name: str, method_signature: str = None) -> dict:
     """
     Renames a specific method.
 
     Args:
         method_name: Current method name (can include signature)
         new_name: New name for the method
+        method_signature: Optional method signature/descriptor (e.g. '(I)V') to distinguish overloads
 
     Returns:
         dict: Confirmation of rename operation
@@ -43,7 +44,10 @@ async def rename_method(method_name: str, new_name: str) -> dict:
     MCP Tool: rename_method
     Description: Refactors method name and updates all call sites
     """
-    return await get_from_jadx("rename-method", {"method_name": method_name, "new_name": new_name})
+    params = {"method_name": method_name, "new_name": new_name}
+    if method_signature:
+        params["method_signature"] = method_signature
+    return await get_from_jadx("rename-method", params)
 
 
 async def rename_field(class_name: str, field_name: str, new_name: str) -> dict:
