@@ -155,16 +155,6 @@ call_tool "get_main_application_classes_names" '{}' 25 | jq -r '.result[]? // .r
 echo "--- get_main_application_classes_code (offset=0,count=1) ---"
 call_tool "get_main_application_classes_code" '{"offset":0,"count":1}' 26 | jq -r '.result // .'
 
-# 19) rename operations (use with care; examples commented)
-echo "--- rename_class ---"
-call_tool "rename_class"  '{"class_name":"com.zin.dvac.AuthActivity","new_name":"WebViewActivity"}' 27 | jq
-echo "--- rename_method ---"
-call_tool "rename_method" '{"method_name":"com.zin.dvac.AuthActivity.onCreate","new_name":"initializeWebView"}' 28 | jq
-echo "--- rename_field ---"
-call_tool "rename_field"  '{"class_name":"com.zin.dvac.LoginActivity","field_name":"editTextLoginPassword","new_name":"passwordInputField"}' 29 | jq
-echo "--- rename_variable ---"
-call_tool "rename_variable" '{"class_name":"com.zin.dvac.ChangePasswordActivity","method_name":"onCreate","variable_name":"ipAddress","new_name":"foobar"}' 30 | jq
-
 # 20) get stack frames from debugger
 echo "--- debug_get_stack_frames ---"
 call_tool "debug_get_stack_frames" '{}' 31 | jq -r '.result[]? // .'
@@ -181,20 +171,30 @@ call_tool "debug_get_variables" '{}' 33 | jq -r '.result[]? // .'
 echo "--- search_classes_by_keyword ---"
 call_tool "search_classes_by_keyword" '{"search_term":"login","offset":0,"count":5}' 34 | jq -r '.result[]? // .'
 
-#25) rename package 
-echo "--- rename_package ---"
-call_tool "rename_package" '{"old_package_name":"com.zin.dvac","new_package_name":"com.example.secureapp"}' 35 | jq -r '.result[]? // .'
-
-#26) get_xrefs_to_class (class_name="DatabaseHelper", offset=0, count=2) "
+#25) get_xrefs_to_class (class_name="DatabaseHelper", offset=0, count=2) "
 echo "--- get_xrefs_to_class (class_name='com.zin.dvac.DatabaseHelper', offset=0, count=2) ---"
 call_tool "get_xrefs_to_class" '{"class_name":"com.zin.dvac.DatabaseHelper","offset":0,"count":2}' 36 | jq -r '.result // .'
 
-#27) get_xrefs_to_method 
+#26) get_xrefs_to_method 
 echo "--- get_xrefs_to_method (class_name='com.zin.dvac.DatabaseHelper', method_name='addPassword', offset=0, count=2) ---"
 call_tool "get_xrefs_to_method" '{"class_name":"com.zin.dvac.DatabaseHelper","method_name":"addPassword","offset":0,"count":2}' 37 | jq -r '.result // .'
 
-#28) get_xrefs_to_field
-echo "--- get_xrefs_to_field (class_name='com.zin.dvac.DatabaseHelper', field_name='DATBASE_NAME', offset=0, count=2) ---"
+#27) get_xrefs_to_field
+echo "--- get_xrefs_to_field (class_name='com.zin.dvac.DatabaseHelper', field_name='DATABASE_NAME', offset=0, count=2) ---"
 call_tool "get_xrefs_to_field" '{"class_name":"com.zin.dvac.DatabaseHelper","field_name":"DATABASE_NAME","offset":0,"count":2}' 38 | jq -r '.result // .'
+
+# 19) rename operations (use with care; examples commented)
+echo "--- rename_class ---"
+call_tool "rename_class"  '{"class_name":"com.zin.dvac.AuthActivity","new_name":"WebViewActivity"}' 27 | jq
+echo "--- rename_method ---"
+call_tool "rename_method" '{"method_name":"com.zin.dvac.AuthActivity.onCreate","new_name":"initializeWebView"}' 28 | jq
+echo "--- rename_field ---"
+call_tool "rename_field"  '{"class_name":"com.zin.dvac.LoginActivity","field_name":"editTextLoginPassword","new_name":"passwordInputField"}' 29 | jq
+echo "--- rename_variable ---"
+call_tool "rename_variable" '{"class_name":"com.zin.dvac.ChangePasswordActivity","method_name":"onCreate","variable_name":"ipAddress","new_name":"foobar"}' 30 | jq
+
+#28) rename package 
+echo "--- rename_package ---"
+call_tool "rename_package" '{"old_package_name":"com.zin.dvac","new_package_name":"com.example.secureapp"}' 35 | jq -r '.result[]? // .'
 
 echo "== done =="
