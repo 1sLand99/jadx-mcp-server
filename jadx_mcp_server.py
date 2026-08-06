@@ -263,9 +263,16 @@ async def rename_class(class_name: str, new_name: str) -> dict:
 
 
 @mcp.tool()
-async def rename_method(method_name: str, new_name: str, method_signature: str = None) -> dict:
-    """Renames a specific method."""
-    return await tools.refactor_tools.rename_method(method_name, new_name, method_signature)
+async def rename_method(
+    method_name: str,
+    new_name: str,
+    class_name: str = None,
+    method_signature: str = None,
+) -> dict:
+    """Renames a specific method, optionally scoped to class_name."""
+    return await tools.refactor_tools.rename_method(
+        method_name, new_name, class_name, method_signature
+    )
 
 
 @mcp.tool()
@@ -397,7 +404,9 @@ def main():
         mcp.run(transport="streamable-http", host=args.host, port=args.port)
     else:
         # StdIO transport must keep stdout reserved for MCP frames.
-        mcp.run()
+        # FastMCP's startup banner can pollute stdio MCP handshakes in some clients.
+        # Keep banner disabled for deterministic stdio initialization (issue #60).
+        mcp.run(show_banner=False)
 
 
 if __name__ == "__main__":

@@ -29,13 +29,19 @@ async def rename_class(class_name: str, new_name: str) -> dict:
     return await get_from_jadx("rename-class", {"class_name": class_name, "new_name": new_name})
 
 
-async def rename_method(method_name: str, new_name: str, method_signature: str = None) -> dict:
+async def rename_method(
+    method_name: str,
+    new_name: str,
+    class_name: str = None,
+    method_signature: str = None,
+) -> dict:
     """
     Renames a specific method.
 
     Args:
         method_name: Current method name (can include signature)
         new_name: New name for the method
+        class_name: Optional fully qualified class name to scope the rename
         method_signature: Optional method signature/descriptor (e.g. '(I)V') to distinguish overloads
 
     Returns:
@@ -45,6 +51,8 @@ async def rename_method(method_name: str, new_name: str, method_signature: str =
     Description: Refactors method name and updates all call sites
     """
     params = {"method_name": method_name, "new_name": new_name}
+    if class_name:
+        params["class_name"] = class_name
     if method_signature:
         params["method_signature"] = method_signature
     return await get_from_jadx("rename-method", params)
