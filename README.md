@@ -111,13 +111,51 @@ Thanks to these wonderful people for their contributions ⭐
     <td>
       <a href="https://github.com/LilNick0101">
         <img src="https://avatars.githubusercontent.com/u/100995805?v=4" width="30px;" alt=""/>
-        <br /><sub><b>LikNick0101</b></sub>
+        <br /><sub><b>LilNick0101</b></sub>
       </a>
     </td>
     <td>
       <a href="https://github.com/lwsinclair">
         <img src="https://avatars.githubusercontent.com/u/2829939?v=4" width="30px;" alt=""/>
         <br /><sub><b>lwsinclair</b></sub>
+      </a>
+    </td>
+  </tr>
+  <tr align="center">
+    <td>
+      <a href="https://github.com/LYC-Android">
+        <img src="https://avatars.githubusercontent.com/u/18358825?v=4" width="30px;" alt=""/>
+        <br /><sub><b>LYC-Android</b></sub>
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/zbhello">
+        <img src="https://avatars.githubusercontent.com/u/122980705?v=4" width="30px;" alt=""/>
+        <br /><sub><b>zbhello</b></sub>
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/1yearning1">
+        <img src="https://avatars.githubusercontent.com/u/297883149?v=4" width="30px;" alt=""/>
+        <br /><sub><b>1yearning1</b></sub>
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/mhsjzsq">
+        <img src="https://avatars.githubusercontent.com/u/116739454?v=4" width="30px;" alt=""/>
+        <br /><sub><b>mhsjzsq</b></sub>
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/darkblack1234">
+        <img src="https://avatars.githubusercontent.com/u/139411545?v=4" width="30px;" alt=""/>
+        <br /><sub><b>darkblack1234</b></sub>
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/Merrg1n">
+        <img src="https://avatars.githubusercontent.com/u/22628584?v=4" width="30px;" alt=""/>
+        <br /><sub><b>Merrg1n</b></sub>
       </a>
     </td>
   </tr>
